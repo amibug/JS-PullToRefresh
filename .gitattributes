@@ -1,1 +1,2 @@
+special-vendored-path/* linguist-vendored
 *.css linguist-vendored=false
