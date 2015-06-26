@@ -7,7 +7,7 @@
 
 [DEMO链接](http://s.codepen.io/hzxs1990225/debug/eNyYmK?)
 
-## 用法
+## 用法(依赖jquery)
 
     (function() {
         $('#wrap').pullToRefresh({
