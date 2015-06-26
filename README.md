@@ -1,6 +1,10 @@
 # JS-PullToRefresh
 移动端下拉刷新组件
 
+## 示例
+
+![示例](images/demo.gif)
+
 ## demo
 
 ![扫一扫](images/demo_qr.png)
