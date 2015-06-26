@@ -26,6 +26,7 @@
         };
 
         var self = this,
+            $document = $(document),
             $element = $(element),
             $pullElem,
             $icon,
@@ -65,40 +66,46 @@
 
         var onTouchStart = function (event) {
             self.startPageY = event.originalEvent.touches[0].pageY;
+            self.startScrollTop = $element.scrollTop();
         };
 
         var onTouchMove = function (event) {
-            event.preventDefault();
             var settings = self.settings,
                 currentPageY = event.originalEvent.touches[0].pageY,
                 diff = currentPageY - self.startPageY;
-
-            // 正常的下拉滚动
-            if ($element.scrollTop() > 0 || !!isLoading) {
-                return false;
+            if(!!isLoading) {
+                event.preventDefault();
             }
-            setTransition($pullElem, 0);
-            if (diff > settings.distance) {
-                diff = settings.distance + (diff - settings.distance) / (diff * 0.015);
-                isActivated = true;
-                $text.text(settings.msg.releaseText);
-            } else {
-                $text.text(settings.msg.pullText);
-                isActivated = false;
+            // 下拉
+            if ($element.scrollTop() <= 0 && diff > 0 && !isLoading) {
+                // 解决scroll的部分是body的情况出现的问题
+                if($document.scrollTop() >0 ) return;
+                event.preventDefault();
+                setTransition($pullElem, 0);
+                if (diff > settings.distance) {
+                    diff = settings.distance + (diff - settings.distance) / (diff * 0.015);
+                    isActivated = true;
+                    $text.text(settings.msg.releaseText);
+                } else {
+                    $text.text(settings.msg.pullText);
+                    isActivated = false;
+                }
+                $pullElem.css({'height': diff});
             }
-            $pullElem.css({'height': diff});
         };
 
         var onTouchEnd = function (event) {
             var settings = self.settings;
             setTransition($pullElem, 350);
-            if (!!isActivated) {
-                $pullElem.css({'height': settings.distance*0.6});
+            if (!!isActivated && !isLoading) {
+                $pullElem.css({'height': settings.distance * 0.6});
                 $text.text(settings.msg.loadingText);
                 isLoading = true;
-            } else {
+                settings.callback();
+            } else if(!isLoading) {
                 $pullElem.css({'height': 0});
             }
+            isActivated = false;
         };
 
 
