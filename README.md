@@ -1,44 +1,24 @@
-# kclass
-组件继承和事件机制
+# JS-PullToRefresh
+移动端下拉刷新组件
 
+## demo
+
+![扫一扫](images/demo_qr.png)
+
+[DEMO链接](http://s.codepen.io/hzxs1990225/debug/eNyYmK?)
+
+## 用法(依赖jquery)
 
     (function() {
-        var Person = Kclass.extend({
-            init: function (options) {
-                console.log('initPerson');
+        $('#wrap').pullToRefresh({
+            distance: 80                    //  定义下拉距离开始刷新
+            msg: {
+                pullText: '下拉刷新...',    // 如果用组件默认的template，可以自定义文案
+                releaseText: '松开刷新   ',
+                loadingText: '正在加载...'
             },
-            call: function () {
-                console.log('call');
-            }
+            clazz: '',                      // 如果用组件默认的template，可以追加class
+            template: '<div </div>',        // 自定义下拉节点的html template
+            callback: function(){}          // loading callback
         });
-        var Son = Person.extend({
-            init: function (options) {
-                this.supr(options);
-                console.log('initSon');
-            }
-        });
-        var Daughter = Person.extend({
-            init: function (options) {
-                this.supr(options);
-                console.log('initDaughter');
-            }
-        });
-        var Tom = new Son();  // console.log initPerson initSon
-        var Lili = new Daughter(); // console.log initPerson initDaughter
-    
-        Tom.on('init', function () {
-            console.log('initTom');
-        });
-        Lili.once('init', function () {
-            console.log('initLili');
-        });
-        Tom.emit('init'); // console.log initTom
-        Lili.emit('init'); // console.log  initLili
-        Lili.emit('init'); // console.log nothing
-        Tom.off('init'); //
-        Tom.emit('init'); // console.log nothing
-        console.log(Lili instanceof Person);//true
-        console.log(Lili instanceof Daughter);//true
-        console.log(Tom instanceof Person);//true
-        console.log(Tom instanceof Son);//true
     }());
