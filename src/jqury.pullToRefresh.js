@@ -12,23 +12,24 @@
             distance: 80,
             clazz: '',
             msg: {
-                pullText: 'Pull to refresh',
-                releaseText: 'Release to refresh',
-                loadingText: 'Loading...'
+                pullText: '下拉刷新...',
+                releaseText: '松开刷新   ',
+                loadingText: '正在加载...'
             },
             template: '<div class="m-pullToRefresh {clazz}" style="height: 0px;overflow: hidden;">' +
                 '<div class="message">' +
-                '<span class="pull">{pullText}</span>' +
-                '<span class="release">{releaseText}</span>' +
-                '<span class="loading">{loadingText}</span>' +
+                '<i></i>' +
+                '<span>{text}</span>' +
                 '</div>' +
                 '</div>',
-            onOK: $.noop
+            callback: $.noop
         };
 
         var self = this,
             $element = $(element),
             $pullElem,
+            $icon,
+            $text,
             isActivated = false,
             isLoading = false;
 
@@ -46,18 +47,23 @@
         self.initNode = function () {
             var settings = self.settings,
                 html = settings.template.replace('{clazz}', settings.clazz)
-                    .replace('{pullText}', settings.pullText)
-                    .replace('{releaseText}', settings.releaseText)
-                    .replace('{loadingText}', settings.loadingText);
+                    .replace('{text}', settings.msg.pullText);
             $element.prepend(html);
+            $icon = $element.find('.m-pullToRefresh i');
+            $text = $element.find('.m-pullToRefresh span');
             $pullElem = $element.find('.m-pullToRefresh');
             $element.on('touchstart', onTouchStart.bind(this))
                 .on('touchmove', onTouchMove.bind(this))
                 .on('touchend', onTouchEnd.bind(this))
-        }
+        };
+
+
+        self.reset = function () {
+            $pullElem.css({'height': 0});
+            isLoading = false;
+        };
 
         var onTouchStart = function (event) {
-
             self.startPageY = event.originalEvent.touches[0].pageY;
         };
 
@@ -73,12 +79,13 @@
             }
             setTransition($pullElem, 0);
             if (diff > settings.distance) {
-                diff = settings.distance + (diff - settings.distance) / (diff * 0.01);
+                diff = settings.distance + (diff - settings.distance) / (diff * 0.015);
                 isActivated = true;
+                $text.text(settings.msg.releaseText);
             } else {
+                $text.text(settings.msg.pullText);
                 isActivated = false;
             }
-            console.log(diff);
             $pullElem.css({'height': diff});
         };
 
@@ -86,7 +93,9 @@
             var settings = self.settings;
             setTransition($pullElem, 350);
             if (!!isActivated) {
-                $pullElem.css({'height': 100});
+                $pullElem.css({'height': settings.distance*0.6});
+                $text.text(settings.msg.loadingText);
+                isLoading = true;
             } else {
                 $pullElem.css({'height': 0});
             }
@@ -113,4 +122,4 @@
         });
     };
 
-})(jQuery || Zepto);
+})(window.jQuery || window.Zepto);

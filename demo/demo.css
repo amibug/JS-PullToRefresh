@@ -2973,3 +2973,18 @@ div.w-share {
     max-width: 540px;
     z-index: 9999;
 }
+
+.m-pullToRefresh {
+    position: relative;text-align: center;color: #000;
+}
+.m-pullToRefresh i{
+    position: absolute;bottom: -1px;left: 50%;margin-left: -35px;
+    width: 29px;height: 150px;background: url('../images/shoppingbag.png');
+    background-size:  100%;
+}
+.m-pullToRefresh span{
+    position: absolute;left: 50%;bottom: 10px;
+}
+.m-pullToRefresh i, .m-pullToRefresh span{
+    display: inline-block;
+}
