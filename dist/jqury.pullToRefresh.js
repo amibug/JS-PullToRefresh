@@ -72,23 +72,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	                releaseText: '松开刷新   ',
 	                loadingText: '正在加载...'
 	            },
-	            template: '<div class="m-pullToRefresh {clazz}" style="height: 0px;overflow: hidden;">' +
-	                '<div class="message">' +
-	                '<i></i>' +
-	                '<span>{text}</span>' +
-	                '</div>' +
-	                '</div>',
-	            callback: $.noop
+	            locked: false,	// 在第一次进页面时，转菊花的时候不想激活，可以设置成true
+	            template: '<div class="m-pullToRefresh {clazz}" style="height: 0px;overflow: hidden;">'
+	                + '<div class="message">'
+	                + '<i></i>'
+	                + '<span>{text}</span>' + '</div>' + '</div>',
+	            callback: $.noop  // realse 状态下释放触发的回调
 	        };
 
-	        var self = this,
-	            $document = $(document),
-	            $element = $(element),
-	            $pullElem,
-	            $icon,
-	            $text,
-	            isActivated = false,
-	            isLoading = false;
+	        var self = this, $document = $(document), $element = $(element), $pullElem, $icon, $text,
+	        // 组件内部转态
+	            isActivated = false,  // 是否有效释放
+	            isLoading = false;    // 是否在loading
 
 	        self.settings = {};
 
@@ -102,22 +97,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 
 	        self.initNode = function () {
-	            var settings = self.settings,
-	                html = settings.template.replace('{clazz}', settings.clazz)
-	                    .replace('{text}', settings.msg.pullText);
+	            var settings = self.settings, html = settings.template
+	                .replace('{clazz}', settings.clazz).replace(
+	                '{text}', settings.msg.pullText);
 	            $element.prepend(html);
 	            $icon = $element.find('.m-pullToRefresh i');
 	            $text = $element.find('.m-pullToRefresh span');
 	            $pullElem = $element.find('.m-pullToRefresh');
-	            $element.on('touchstart', onTouchStart.bind(this))
-	                .on('touchmove', onTouchMove.bind(this))
-	                .on('touchend', onTouchEnd.bind(this))
+	            $element.on('touchstart', onTouchStart.bind(this)).on(
+	                'touchmove', onTouchMove.bind(this)).on('touchend',
+	                onTouchEnd.bind(this))
 	        };
 
-
 	        self.reset = function () {
-	            $pullElem.css({'height': 0});
+	            $pullElem.css({
+	                'height': 0
+	            });
 	            isLoading = false;
+	            this.setLocked(false);
+	        };
+
+	        self.setLocked = function (flag) {
+	            var settings = self.settings;
+	            settings.locked = !!flag;
 	        };
 
 	        var onTouchStart = function (event) {
@@ -126,27 +128,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 
 	        var onTouchMove = function (event) {
-	            var settings = self.settings,
-	                currentPageY = event.originalEvent.touches[0].pageY,
-	                diff = currentPageY - self.startPageY;
-	            if(!!isLoading) {
+	            var settings = self.settings, currentPageY = event.originalEvent.touches[0].pageY, diff = currentPageY
+	                - self.startPageY;
+	            if (!!isLoading) {
 	                event.preventDefault();
 	            }
 	            // 下拉
-	            if ($element.scrollTop() <= 0 && diff > 0 && !isLoading) {
+	            if ($element.scrollTop() <= 0 && diff > 0 && !isLoading && !settings.locked) {
 	                // 解决scroll的部分是body的情况出现的问题
-	                if($document.scrollTop() >0 ) return;
+	                if ($document.scrollTop() > 0)
+	                    return;
 	                event.preventDefault();
 	                setTransition($pullElem, 0);
 	                if (diff > settings.distance) {
-	                    diff = settings.distance + (diff - settings.distance) / (diff * 0.015);
+	                    diff = settings.distance
+	                        + (diff - settings.distance)
+	                        / (diff * 0.015);
 	                    isActivated = true;
 	                    $text.text(settings.msg.releaseText);
 	                } else {
 	                    $text.text(settings.msg.pullText);
 	                    isActivated = false;
 	                }
-	                $pullElem.css({'height': diff});
+	                $pullElem.css({
+	                    'height': diff
+	                });
 	            }
 	        };
 
@@ -154,16 +160,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var settings = self.settings;
 	            setTransition($pullElem, 350);
 	            if (!!isActivated && !isLoading) {
-	                $pullElem.css({'height': settings.distance * 0.6});
+	                $pullElem.css({
+	                    'height': settings.distance * 0.6
+	                });
 	                $text.text(settings.msg.loadingText);
 	                isLoading = true;
 	                settings.callback();
-	            } else if(!isLoading) {
-	                $pullElem.css({'height': 0});
+	            } else if (!isLoading) {
+	                $pullElem.css({
+	                    'height': 0
+	                });
 	            }
 	            isActivated = false;
 	        };
-
 
 	        var setTransition = function (dom, num) {
 	            dom.css({
